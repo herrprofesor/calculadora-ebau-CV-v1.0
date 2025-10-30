@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Calculadora Nota de Bachillerato - Versión Tarjetas</title>
+  <style>
+    :root{
+      --bg:#f6f8fb;
+      --card:#ffffff;
+      --muted:#556;
+      --accent:#2463ff;
+      --radius:12px;
+      --shadow:0 6px 18px rgba(20,30,60,0.08);
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:#111;
+      padding:20px;
+    }
+    header{
+      max-width:1200px;
+      margin:0 auto 18px;
+      text-align:center;
+    }
+    h1{margin:6px 0 4px;font-size:22px}
+    p.lead{margin:0;color:var(--muted)}
+    .container{
+      max-width:1200px;
+      margin:18px auto 60px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+    /* three column layout */
+    .cols{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:14px;
+      align-items:start;
+    }
+    @media (max-width:980px){
+      .cols{grid-template-columns:1fr; }
+    }
+    .card{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:14px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .card h2{
+      margin:0;
+      text-align:center;
+      font-size:16px;
+      font-weight:700;
+    }
+    .inputs{display:flex;flex-direction:column;gap:8px;}
+    .field{display:flex;flex-direction:column;gap:6px}
+    label{font-size:13px;color:var(--muted)}
+    input[type="number"]{
+      padding:8px;border-radius:8px;border:1px solid #d7e0ef;font-size:14px;
+      width:100%;
+      -moz-appearance: textfield;
+    }
+    /* show spinner arrows but step controlled through JS/HTML step attribute */
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: auto;
+      margin: 0;
+    }
+    input[type="text"], select{
+      padding:8px;border-radius:8px;border:1px solid #d7e0ef;font-size:14px;width:100%;
+    }
+    .row{display:flex;gap:8px}
+    .btn{
+      padding:8px 10px;border-radius:10px;border:0;background:var(--accent);color:white;font-weight:700;cursor:pointer;
+    }
+    .btn.ghost{background:#fff;border:1px solid #d7e0ef;color:#333;font-weight:600}
+    .btn.small{padding:6px 8px;font-size:13px}
+    .muted{color:var(--muted);font-size:13px}
+    .results{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:10px;
+    }
+    .res-item{background:#fff;padding:12px;border-radius:10px;border:1px solid #eef3ff}
+    .res-item .val{font-weight:800;font-size:18px;margin-top:6px}
+    .footer-row{display:flex;gap:8px;align-items:center;justify-content:space-between}
+    .center{display:flex;gap:8px;align-items:center;justify-content:center}
+    .small-muted{font-size:12px;color:var(--muted)}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🧮 Calculadora de Nota de Acceso (Comunitat Valenciana)</h1>
+    <p class="lead">Introduce tus notas (0–10). Todo se calcula en tu navegador y se actualiza automáticamente. Paso de notas: 1 (enteros).</p>
+  </header>
+
+  <main class="container">
+    <div class="cols">
+      <!-- COL 1: 1.º de Bachillerato -->
+      <section class="card" id="col1">
+        <h2>1.º de Bachillerato</h2>
+        <div class="inputs">
+          <div class="field col1-input">
+            <label>Filosofía</label>
+            <input type="number" id="b1_filosofia" min="0" max="10" step="1" />
+          </div>
+          <div class="field col1-input">
+            <label>Castellano</label>
+            <input type="number" id="b1_castellano" min="0" max="10" step="1" />
+          </div>
+          <div class="field col1-input">
+            <label>Valenciano</label>
+            <input type="number" id="b1_valenciano" min="0" max="10" step="1" />
+          </div>
+          <div class="field">
+            <label>Idioma (elige y pon nota)</label>
+            <div class="row">
+              <select id="b1_idioma_sel" style="flex:1">
+                <option value="Inglés">Inglés</option>
+                <option value="Francés">Francés</option>
+              </select>
+              <input class="col1-input" type="number" id="b1_idioma" min="0" max="10" step="1" placeholder="Nota" style="width:110px" />
+            </div>
+          </div>
+          <div class="field col1-input">
+            <label>Matemáticas</label>
+            <input type="number" id="b1_mates" min="0" max="10" step="1" />
+          </div>
+          <div class="field col1-input">
+            <label>Física y Química</label>
+            <input type="number" id="b1_fq" min="0" max="10" step="1" />
+          </div>
+          <div class="field col1-input">
+            <label>Educación Física</label>
+            <input type="number" id="b1_ef" min="0" max="10" step="1" />
+          </div>
+
+          <div class="field">
+            <label>Biología y Geología / Dibujo Técnico / Tecnología</label>
+            <div class="row">
+              <select id="b1_triple_sel" style="flex:1">
+                <option value="Biología y Geología">Biología y Geología</option>
+                <option value="Dibujo Técnico">Dibujo Técnico</option>
+                <option value="Tecnología">Tecnología</option>
+              </select>
+              <input class="col1-input" type="number" id="b1_triple" min="0" max="10" step="1" placeholder="Nota" style="width:110px" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Optativa 1 - Nombre</label>
+            <input type="text" id="b1_opt1_name" placeholder="Nombre optativa 1 (editable)" />
+            <label class="small-muted">Optativa 1 - Nota</label>
+            <input class="col1-input" type="number" id="b1_opt1" min="0" max="10" step="1" />
+          </div>
+
+          <div class="field">
+            <label>Optativa 2 - Nombre</label>
+            <input type="text" id="b1_opt2_name" placeholder="Nombre optativa 2 (editable)" />
+            <label class="small-muted">Optativa 2 - Nota</label>
+            <input class="col1-input" type="number" id="b1_opt2" min="0" max="10" step="1" />
+          </div>
+
+          <div class="center" style="margin-top:6px">
+            <button class="btn ghost small" onclick="clearColumn(1)">🧹 Limpiar columna</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- COL 2: 2.º de Bachillerato -->
+      <section class="card" id="col2">
+        <h2>2.º de Bachillerato</h2>
+        <div class="inputs">
+          <div class="field col2-input">
+            <label>Historia</label>
+            <input type="number" id="b2_historia" min="0" max="10" step="1" />
+          </div>
+          <div class="field col2-input">
+            <label>Castellano</label>
+            <input type="number" id="b2_castellano" min="0" max="10" step="1" />
+          </div>
+          <div class="field col2-input">
+            <label>Valenciano</label>
+            <input type="number" id="b2_valenciano" min="0" max="10" step="1" />
+          </div>
+          <div class="field col2-input">
+            <label>Filosofía</label>
+            <input type="number" id="b2_filosofia" min="0" max="10" step="1" />
+          </div>
+          <div class="field">
+            <label>Idioma (elige y pon nota)</label>
+            <div class="row">
+              <select id="b2_idioma_sel" style="flex:1">
+                <option value="Inglés">Inglés</option>
+                <option value="Francés">Francés</option>
+              </select>
+              <input class="col2-input" type="number" id="b2_idioma" min="0" max="10" step="1" placeholder="Nota" style="width:110px" />
+            </div>
+          </div>
+          <div class="field col2-input">
+            <label>Matemáticas</label>
+            <input type="number" id="b2_mates" min="0" max="10" step="1" />
+          </div>
+
+          <div class="field">
+            <label>Química / Dibujo Técnico / Tecnología</label>
+            <div class="row">
+              <select id="b2_triple_sel" style="flex:1">
+                <option value="Química">Química</option>
+                <option value="Dibujo Técnico">Dibujo Técnico</option>
+                <option value="Tecnología">Tecnología</option>
+              </select>
+              <input class="col2-input" type="number" id="b2_triple" min="0" max="10" step="1" placeholder="Nota" style="width:110px" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Física / Biología</label>
+            <div class="row">
+              <select id="b2_fb_sel" style="flex:1">
+                <option value="Física">Física</option>
+                <option value="Biología">Biología</option>
+              </select>
+              <input class="col2-input" type="number" id="b2_fb" min="0" max="10" step="1" placeholder="Nota" style="width:110px" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Optativa - Nombre</label>
+            <input type="text" id="b2_opt_name" placeholder="Nombre optativa (editable)" />
+            <label class="small-muted">Optativa - Nota</label>
+            <input class="col2-input" type="number" id="b2_opt" min="0" max="10" step="1" />
+          </div>
+
+          <div class="center" style="margin-top:6px">
+            <button class="btn ghost small" onclick="clearColumn(2)">🧹 Limpiar columna</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- COL 3: EBAU -->
+      <section class="card" id="col3">
+        <h2>EBAU (fase general + voluntaria)</h2>
+        <div class="inputs">
+          <div class="field col3-input">
+            <label>Castellano (fase general)</label>
+            <input type="number" id="g_castellano" min="0" max="10" step="1" />
+          </div>
+          <div class="field col3-input">
+            <label>Valenciano (fase general)</label>
+            <input type="number" id="g_valenciano" min="0" max="10" step="1" />
+          </div>
+          <div class="field">
+            <label>Idioma (Inglés / Francés) - fase general</label>
+            <div class="row">
+              <select id="g_idioma_sel" style="flex:1">
+                <option value="Inglés">Inglés</option>
+                <option value="Francés">Francés</option>
+              </select>
+              <input class="col3-input" type="number" id="g_idioma" min="0" max="10" step="1" placeholder="Nota" style="width:110px" />
+            </div>
+          </div>
+          <div class="field">
+            <label>Historia / Filosofía (fase general)</label>
+            <div class="row">
+              <select id="g_hf_sel" style="flex:1">
+                <option value="Historia">Historia</option>
+                <option value="Filosofía">Filosofía</option>
+              </select>
+              <input class="col3-input" type="number" id="g_hf" min="0" max="10" step="1" placeholder="Nota" style="width:110px" />
+            </div>
+          </div>
+
+          <div class="field col3-input">
+            <label>Matemáticas (fase general)</label>
+            <input type="number" id="g_mates" min="0" max="10" step="1" />
+          </div>
+
+          <hr style="border:none;border-top:1px solid #eef3ff;margin:6px 0" />
+
+          <div style="font-weight:700">Fase voluntaria (2 materias)</div>
+
+          <div class="field">
+            <label>Materia voluntaria 1 - Nombre</label>
+            <input type="text" id="v1_name" placeholder="Nombre materia 1 (editable)" />
+            <label class="small-muted">Nota</label>
+            <input class="col3-input" type="number" id="v1_nota" min="0" max="10" step="1" />
+            <label class="small-muted">Ponderación</label>
+            <select id="v1_pond">
+              <option value="0.1">0.1</option>
+              <option value="0.2">0.2</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Materia voluntaria 2 - Nombre</label>
+            <input type="text" id="v2_name" placeholder="Nombre materia 2 (editable)" />
+            <label class="small-muted">Nota</label>
+            <input class="col3-input" type="number" id="v2_nota" min="0" max="10" step="1" />
+            <label class="small-muted">Ponderación</label>
+            <select id="v2_pond">
+              <option value="0.1">0.1</option>
+              <option value="0.2">0.2</option>
+            </select>
+          </div>
+
+          <div class="center" style="margin-top:6px">
+            <button class="btn ghost small" onclick="clearColumn(3)">🧹 Limpiar columna</button>
+          </div>
+
+        </div>
+      </section>
+    </div> <!-- end cols -->
+
+    <!-- Results block -->
+    <section class="card" id="results">
+      <h2>Resultados</h2>
+      <div class="results">
+        <div class="res-item">
+          <div class="muted">Media Bachillerato (1.º + 2.º)</div>
+          <div id="r_bach" class="val">—</div>
+        </div>
+        <div class="res-item">
+          <div class="muted">Media Fase General (EBAU)</div>
+          <div id="r_ebau_gen" class="val">—</div>
+        </div>
+        <div class="res-item">
+          <div class="muted">Nota de acceso (0.6×Bach + 0.4×Fase General)</div>
+          <div id="r_acceso" class="val">—</div>
+        </div>
+        <div class="res-item">
+          <div class="muted">Aportación voluntaria 1 (Pond × nota)</div>
+          <div id="r_v1" class="val">—</div>
+        </div>
+        <div class="res-item">
+          <div class="muted">Aportación voluntaria 2 (Pond × nota)</div>
+          <div id="r_v2" class="val">—</div>
+        </div>
+        <div class="res-item">
+          <div class="muted">Nota total (con voluntarias)</div>
+          <div id="r_total" class="val">—</div>
+        </div>
+      </div>
+
+      <div class="footer-row" style="margin-top:12px">
+        <div class="small-muted">Nota: los resultados se actualizan automáticamente al modificar cualquier campo.</div>
+        <div>
+          <button class="btn ghost" onclick="clearAll()">🧼 Limpiar todo</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    /* Utility functions */
+    function getNum(id){
+      const el = document.getElementById(id);
+      if(!el) return NaN;
+      const v = parseFloat(el.value);
+      return isNaN(v) ? NaN : v;
+    }
+    function round3(n){ return isNaN(n) ? NaN : Math.round(n*1000)/1000; }
+    function setText(id, val){
+      const el=document.getElementById(id);
+      el.textContent = isNaN(val) ? '—' : round3(val).toFixed(3);
+    }
+
+    /* Collect IDs for Bachillerato (1º + 2º) */
+    const b1_ids = ['b1_filosofia','b1_castellano','b1_valenciano','b1_idioma','b1_mates','b1_fq','b1_ef','b1_triple','b1_opt1','b1_opt2'];
+    const b2_ids = ['b2_historia','b2_castellano','b2_valenciano','b2_filosofia','b2_idioma','b2_mates','b2_triple','b2_fb','b2_opt'];
+
+    /* Hook events to update automatically */
+    function attachListeners(){
+      // all number inputs and selects and text inputs that can affect calculations
+      const inputs = document.querySelectorAll('input[type="number"], select');
+      inputs.forEach(inp=>{
+        inp.addEventListener('input', calculate);
+        inp.addEventListener('change', calculate);
+      });
+      // also when optativa names are changed nothing numeric changes, but keep them editable (no calculate needed)
+    }
+
+    /* Clear helpers */
+    function clearColumn(n){
+      const colClass = 'col'+n+'-input';
+      const els = document.querySelectorAll('.' + colClass);
+      els.forEach(e=>{
+        if(e.tagName === 'INPUT'){
+          if(e.type==='number' || e.type==='text') e.value='';
+        } else {
+          // element may be wrapper; find inputs inside
+          const inner = e.querySelectorAll('input,select');
+          inner.forEach(i=>{
+            if(i.type==='number' || i.type==='text') i.value='';
+            if(i.tagName==='SELECT') i.selectedIndex = 0;
+          });
+        }
+      });
+      // For some fields we used explicit inputs without the class (e.g. selects with paired number inputs)
+      // handle special cases per column
+      if(n===1){
+        // clear b1_idioma select/input pair and triple select/input
+        document.getElementById('b1_idioma').value='';
+        document.getElementById('b1_idioma_sel').selectedIndex=0;
+        document.getElementById('b1_triple').value='';
+        document.getElementById('b1_triple_sel').selectedIndex=0;
+        document.getElementById('b1_opt1_name').value='';
+        document.getElementById('b1_opt2_name').value='';
+      }
+      if(n===2){
+        document.getElementById('b2_idioma').value='';
+        document.getElementById('b2_idioma_sel').selectedIndex=0;
+        document.getElementById('b2_triple').value='';
+        document.getElementById('b2_triple_sel').selectedIndex=0;
+        document.getElementById('b2_fb').value='';
+        document.getElementById('b2_fb_sel').selectedIndex=0;
+        document.getElementById('b2_opt_name').value='';
+      }
+      if(n===3){
+        document.getElementById('g_idioma').value='';
+        document.getElementById('g_idioma_sel').selectedIndex=0;
+        document.getElementById('g_hf').value='';
+        document.getElementById('g_hf_sel').selectedIndex=0;
+        document.getElementById('v1_name').value='';
+        document.getElementById('v1_nota').value='';
+        document.getElementById('v1_pond').selectedIndex=0;
+        document.getElementById('v2_name').value='';
+        document.getElementById('v2_nota').value='';
+        document.getElementById('v2_pond').selectedIndex=0;
+      }
+      // trigger recalc
+      calculate();
+    }
+
+    function clearAll(){
+      // clear all number and text inputs and reset selects
+      document.querySelectorAll('input').forEach(i=>{
+        if(i.type==='number' || i.type==='text') i.value='';
+      });
+      document.querySelectorAll('select').forEach(s=>s.selectedIndex=0);
+      calculate();
+    }
+
+    /* Calculation logic */
+    function calculate(){
+      // Gather bachillerato numbers from both years
+      let vals = [];
+      // b1: treat b1_idioma input id 'b1_idioma', triple 'b1_triple', optativas 'b1_opt1','b1_opt2'
+      b1_ids.forEach(id=>{
+        const v = getNum(id === 'b1_idioma' ? 'b1_idioma' : id);
+        if(!isNaN(v)) vals.push(v);
+      });
+      b2_ids.forEach(id=>{
+        const v = getNum(id === 'b2_idioma' ? 'b2_idioma' : id);
+        if(!isNaN(v)) vals.push(v);
+      });
+      const bach = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : NaN;
+      setText('r_bach', bach);
+
+      // EBAU general: five subjects (castellano, valenciano, idioma, historia/filosofia, mates)
+      const gids = ['g_castellano','g_valenciano','g_idioma','g_hf','g_mates'];
+      let gvals=[];
+      gids.forEach(id=>{
+        const v = getNum(id === 'g_idioma' ? 'g_idioma' : id);
+        if(!isNaN(v)) gvals.push(v);
+      });
+      const ebau_gen = gvals.length ? gvals.reduce((a,b)=>a+b,0)/gvals.length : NaN;
+      setText('r_ebau_gen', ebau_gen);
+
+      // Nota de acceso sin voluntarias
+      const acceso = (!isNaN(bach) && !isNaN(ebau_gen)) ? (0.6*bach + 0.4*ebau_gen) : NaN;
+      setText('r_acceso', acceso);
+
+      // Voluntarias: contributions
+      const v1n = getNum('v1_nota');
+      const v1p = parseFloat(document.getElementById('v1_pond').value);
+      const v2n = getNum('v2_nota');
+      const v2p = parseFloat(document.getElementById('v2_pond').value);
+
+      const v1_ap = (!isNaN(v1n) && !isNaN(v1p)) ? (v1n * v1p) : NaN;
+      const v2_ap = (!isNaN(v2n) && !isNaN(v2p)) ? (v2n * v2p) : NaN;
+
+      setText('r_v1', v1_ap);
+      setText('r_v2', v2_ap);
+
+      // total
+      let total = acceso;
+      if(!isNaN(v1_ap)) total = (isNaN(total) ? v1_ap : total + v1_ap);
+      if(!isNaN(v2_ap)) total = (isNaN(total) ? v2_ap : total + v2_ap);
+      setText('r_total', total);
+    }
+
+    /* Initialization */
+    window.addEventListener('load', ()=>{
+      attachListeners();
+      calculate();
+    });
+  </script>
+
+</body>
+</html>
