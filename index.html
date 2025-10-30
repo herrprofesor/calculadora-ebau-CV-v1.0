@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Calculadora Nota de Bachillerato / EBAU - Comunidad Valenciana</title>
+  <style>
+    :root{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial;margin:0}
+    body{padding:20px;background:#f6f8fb;color:#111}
+    h1{font-size:20px;margin:0 0 10px}
+    .card{background:#fff;border-radius:12px;box-shadow:0 6px 18px rgba(20,30,60,0.08);padding:16px;margin-bottom:14px}
+    label{display:block;font-size:13px;margin-bottom:6px}
+    input[type=number], select, input[type=text]{width:100%;padding:8px;border-radius:8px;border:1px solid #d7e0ef;font-size:14px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+    .small{font-size:13px;color:#556}
+    .row{display:flex;gap:8px}
+    button{padding:10px 14px;border-radius:10px;border:0;background:#2463ff;color:white;font-weight:600;cursor:pointer}
+    button.secondary{background:#fff;border:1px solid #d7e0ef;color:#243;}
+    .result{font-weight:700;font-size:18px}
+    .muted{color:#556;font-size:13px}
+    .inline{display:flex;gap:8px;align-items:center}
+    .weighted{background:#fbfcff;padding:8px;border-radius:8px;border:1px solid #eef3ff}
+    .foot{font-size:13px;color:#556}
+  </style>
+</head>
+<body>
+  <h1>Calculadora: Nota media de Bachillerato y nota de acceso (Comunitat Valenciana)</h1>
+  <p class="muted">Rellena tus notas (0–10). No se guardan datos: todo se calcula en tu navegador. Puedes editar nombres de optativas y de las materias de la fase voluntaria.</p>
+
+  <!-- Contenido igual al anterior -->
+  <!-- Mantendremos el mismo contenido -->
+
+<script>
+function getNum(id){
+  const el = document.getElementById(id);
+  if(!el) return NaN;
+  const v = parseFloat(el.value);
+  return isNaN(v)?NaN:v;
+}
+
+function calcular(){
+  const round3 = (num)=> isNaN(num)?NaN:Math.round(num*1000)/1000;
+  // Gather 1º
+  const b1_ids = ['b1_filosofia','b1_castellano','b1_valenciano','b1_idioma','b1_mates','b1_fq','b1_ef','b1_triple','b1_opt1','b1_opt2'];
+  const b2_ids = ['b2_historia','b2_castellano','b2_valenciano','b2_filosofia','b2_idioma','b2_mates','b2_triple','b2_fb','b2_opt'];
+  let vals = [];
+  b1_ids.forEach(id=>{const n=getNum(id); if(!isNaN(n)) vals.push(n);});
+  b2_ids.forEach(id=>{const n=getNum(id); if(!isNaN(n)) vals.push(n);});
+  const bach = vals.length>0 ? (vals.reduce((a,b)=>a+b,0)/vals.length) : NaN;
+  document.getElementById('r_bach').textContent = isNaN(bach)?'—':round3(bach).toFixed(3);
+
+  // EBAU general
+  const g_ids = ['g_castellano','g_valenciano','g_idioma','g_hf','g_mates'];
+  let gvals=[];
+  g_ids.forEach(id=>{const n=getNum(id); if(!isNaN(n)) gvals.push(n);});
+  const ebau_gen = gvals.length>0 ? (gvals.reduce((a,b)=>a+b,0)/gvals.length) : NaN;
+  document.getElementById('r_ebau_gen').textContent = isNaN(ebau_gen)?'—':round3(ebau_gen).toFixed(3);
+
+  // Nota de acceso sin voluntaria
+  const acceso = (!isNaN(bach) && !isNaN(ebau_gen)) ? (0.6*bach + 0.4*ebau_gen) : NaN;
+  document.getElementById('r_acceso').textContent = isNaN(acceso)?'—':round3(acceso).toFixed(3);
+
+  // Voluntarias
+  const v1_n = getNum('v1_nota');
+  const v1_p = parseFloat(document.getElementById('v1_pond').value);
+  const v2_n = getNum('v2_nota');
+  const v2_p = parseFloat(document.getElementById('v2_pond').value);
+  const v1_ap = (!isNaN(v1_n) && !isNaN(v1_p)) ? round3(v1_n * v1_p) : NaN;
+  const v2_ap = (!isNaN(v2_n) && !isNaN(v2_p)) ? round3(v2_n * v2_p) : NaN;
+  document.getElementById('r_v1').textContent = isNaN(v1_ap)?'—':v1_ap.toFixed(3);
+  document.getElementById('r_v2').textContent = isNaN(v2_ap)?'—':v2_ap.toFixed(3);
+
+  // Total
+  let total = acceso;
+  if(!isNaN(v1_ap)) total = (isNaN(total)?v1_ap:total+v1_ap);
+  if(!isNaN(v2_ap)) total = (isNaN(total)?v2_ap:total+v2_ap);
+  document.getElementById('r_total').textContent = isNaN(total)?'—':round3(total).toFixed(3);
+}
+
+function resetForm(){
+  document.querySelectorAll('input').forEach(i=>{if(i.type==='number'||i.type==='text') i.value='';});
+  document.querySelectorAll('select').forEach(s=>{s.selectedIndex=0;});
+  ['r_bach','r_ebau_gen','r_acceso','r_v1','r_v2','r_total'].forEach(id=>document.getElementById(id).textContent='—');
+}
+</script>
+</body>
+</html>
