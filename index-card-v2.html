@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Calculadora Nota de Acceso (CV) – Versión Tarjetas</title>
+<style>
+:root{
+  --bg:#f7f9fc;
+  --card-bg:#ffffff;
+  --border:#dce3f0;
+  --accent:#2463ff;
+  --muted:#555;
+  --radius:14px;
+  --shadow:0 4px 14px rgba(0,0,0,0.08);
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+}
+body{margin:0;background:var(--bg);color:#111;padding:20px;}
+header{text-align:center;margin-bottom:25px;}
+h1{margin:0;font-size:24px;}
+p.lead{color:var(--muted);margin-top:5px;}
+main{max-width:1200px;margin:0 auto;}
+.columns{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px;}
+.card{background:var(--card-bg);padding:14px 18px;border-radius:var(--radius);box-shadow:var(--shadow);}
+h2{text-align:center;margin-top:0;background:#f0f4ff;padding:6px;border-radius:var(--radius);}
+label{display:flex;justify-content:space-between;align-items:center;margin:4px 0;}
+label span{flex:1;}
+input[type="number"],input[type="text"],select{
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:5px;
+  font-size:14px;
+  width:80px;
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:auto;}
+.btn{padding:6px 10px;border-radius:8px;border:0;cursor:pointer;font-weight:600;}
+.btn.ghost{background:#fff;border:1px solid var(--border);}
+.btn.accent{background:var(--accent);color:white;}
+.footer-buttons{display:flex;justify-content:flex-end;margin-top:10px;}
+.results{margin-top:25px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;}
+.res-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px;}
+.res-card .label{color:var(--muted);font-size:13px;}
+.res-card .val{font-size:18px;font-weight:700;margin-top:4px;}
+.course-avg{margin-top:10px;font-weight:600;text-align:right;color:#333;}
+@media(max-width:700px){label span{font-size:13px;}}
+</style>
+</head>
+<body>
+<header>
+  <h1>🧮 Calculadora Nota de Acceso (Comunitat Valenciana)</h1>
+  <p class="lead">Versión de tarjetas — cálculo automático con tres decimales</p>
+</header>
+
+<main>
+<div class="columns">
+
+  <!-- 1º de Bachillerato -->
+  <div class="card" id="col1">
+    <h2>1.º Bachillerato</h2>
+
+    <label><span>Filosofía</span><input type="number" id="b1_filosofia" min="0" max="10" step="1"></label>
+    <label><span>Castellano</span><input type="number" id="b1_castellano" min="0" max="10" step="1"></label>
+    <label><span>Valenciano</span><input type="number" id="b1_valenciano" min="0" max="10" step="1"></label>
+
+    <label><span>
+      Idioma:
+      <select id="b1_idioma_sel">
+        <option value="Inglés">Inglés</option>
+        <option value="Francés">Francés</option>
+      </select>
+    </span><input type="number" id="b1_idioma" min="0" max="10" step="1"></label>
+
+    <label><span>Matemáticas</span><input type="number" id="b1_mates" min="0" max="10" step="1"></label>
+    <label><span>Física y Química</span><input type="number" id="b1_fq" min="0" max="10" step="1"></label>
+    <label><span>Educación Física</span><input type="number" id="b1_ef" min="0" max="10" step="1"></label>
+
+    <label><span>
+      <select id="b1_triple_sel">
+        <option value="Biología y Geología">Biología y Geología</option>
+        <option value="Dibujo Técnico">Dibujo Técnico</option>
+        <option value="Tecnología">Tecnología</option>
+      </select>
+    </span><input type="number" id="b1_triple" min="0" max="10" step="1"></label>
+
+    <label><input type="text" id="b1_opt1_name" placeholder="Optativa 1"><input type="number" id="b1_opt1" min="0" max="10" step="1"></label>
+    <label><input type="text" id="b1_opt2_name" placeholder="Optativa 2"><input type="number" id="b1_opt2" min="0" max="10" step="1"></label>
+
+    <p class="course-avg">Media 1.º Bachillerato: <span id="avg_b1">—</span></p>
+    <div class="footer-buttons"><button class="btn ghost" onclick="clearColumn(1)">🧹 Limpiar 1.º</button></div>
+  </div>
+  <!-- 2º de Bachillerato -->
+  <div class="card" id="col2">
+    <h2>2.º Bachillerato</h2>
+
+    <label><span>Historia</span><input type="number" id="b2_historia" min="0" max="10" step="1"></label>
+    <label><span>Castellano</span><input type="number" id="b2_castellano" min="0" max="10" step="1"></label>
+    <label><span>Valenciano</span><input type="number" id="b2_valenciano" min="0" max="10" step="1"></label>
+    <label><span>Filosofía</span><input type="number" id="b2_filosofia" min="0" max="10" step="1"></label>
+
+    <label><span>
+      Idioma:
+      <select id="b2_idioma_sel">
+        <option value="Inglés">Inglés</option>
+        <option value="Francés">Francés</option>
+      </select>
+    </span><input type="number" id="b2_idioma" min="0" max="10" step="1"></label>
+
+    <label><span>Matemáticas</span><input type="number" id="b2_mates" min="0" max="10" step="1"></label>
+
+    <label><span>
+      <select id="b2_triple_sel">
+        <option value="Química">Química</option>
+        <option value="Dibujo Técnico">Dibujo Técnico</option>
+        <option value="Tecnología">Tecnología</option>
+      </select>
+    </span><input type="number" id="b2_triple" min="0" max="10" step="1"></label>
+
+    <label><span>
+      <select id="b2_fb_sel">
+        <option value="Física">Física</option>
+        <option value="Biología">Biología</option>
+      </select>
+    </span><input type="number" id="b2_fb" min="0" max="10" step="1"></label>
+
+    <label><input type="text" id="b2_opt_name" placeholder="Optativa"><input type="number" id="b2_opt" min="0" max="10" step="1"></label>
+
+    <p class="course-avg">Media 2.º Bachillerato: <span id="avg_b2">—</span></p>
+    <div class="footer-buttons"><button class="btn ghost" onclick="clearColumn(2)">🧹 Limpiar 2.º</button></div>
+  </div>
+  <!-- EBAU -->
+  <div class="card" id="col3">
+    <h2>EBAU</h2>
+
+    <label><span>Castellano</span><input type="number" id="g_castellano" min="0" max="10" step="1"></label>
+    <label><span>Valenciano</span><input type="number" id="g_valenciano" min="0" max="10" step="1"></label>
+
+    <label><span>
+      Idioma:
+      <select id="g_idioma_sel">
+        <option value="Inglés">Inglés</option>
+        <option value="Francés">Francés</option>
+      </select>
+    </span><input type="number" id="g_idioma" min="0" max="10" step="1"></label>
+
+    <label><span>
+      <select id="g_hf_sel">
+        <option value="Historia">Historia</option>
+        <option value="Filosofía">Filosofía</option>
+      </select>
+    </span><input type="number" id="g_hf" min="0" max="10" step="1"></label>
+
+    <label><span>Matemáticas</span><input type="number" id="g_mates" min="0" max="10" step="1"></label>
+
+    <h3 style="text-align:center;margin:12px 0 6px;">Fase voluntaria</h3>
+
+    <label><input type="text" id="v1_name" placeholder="Materia voluntaria 1"><input type="number" id="v1_nota" min="0" max="10" step="1">
+      <select id="v1_pond">
+        <option value="0.1">0.1</option>
+        <option value="0.2" selected>0.2</option>
+      </select>
+    </label>
+
+    <label><input type="text" id="v2_name" placeholder="Materia voluntaria 2"><input type="number" id="v2_nota" min="0" max="10" step="1">
+      <select id="v2_pond">
+        <option value="0.1">0.1</option>
+        <option value="0.2" selected>0.2</option>
+      </select>
+    </label>
+
+    <div class="footer-buttons"><button class="btn ghost" onclick="clearColumn(3)">🧹 Limpiar EBAU</button></div>
+  </div>
+</div>
+<div class="results">
+  <div class="res-card"><div class="label">Media Bachillerato</div><div class="val" id="r_bach">—</div></div>
+  <div class="res-card"><div class="label">Media Fase General</div><div class="val" id="r_ebau_gen">—</div></div>
+  <div class="res-card"><div class="label">Nota de acceso (NAU)</div><div class="val" id="r_acceso">—</div></div>
+  <div class="res-card"><div class="label">Voluntaria 1</div><div class="val" id="r_v1">—</div></div>
+  <div class="res-card"><div class="label">Voluntaria 2</div><div class="val" id="r_v2">—</div></div>
+  <div class="res-card"><div class="label">Nota total (NAT)</div><div class="val" id="r_total">—</div></div>
+</div>
+
+<div class="footer-buttons">
+  <button class="btn ghost" onclick="clearAll()">🧼 Limpiar todo</button>
+</div>
+
+<script>
+function getNum(id){const e=document.getElementById(id);const v=parseFloat(e.value);return isNaN(v)?NaN:v;}
+function round3(n){return isNaN(n)?NaN:Math.round(n*1000)/1000;}
+function setText(id,v){document.getElementById(id).textContent=isNaN(v)?'—':round3(v).toFixed(3);}
+const b1=['b1_filosofia','b1_castellano','b1_valenciano','b1_idioma','b1_mates','b1_fq','b1_ef','b1_triple','b1_opt1','b1_opt2'];
+const b2=['b2_historia','b2_castellano','b2_valenciano','b2_filosofia','b2_idioma','b2_mates','b2_triple','b2_fb','b2_opt'];
+function attach(){document.querySelectorAll('input[type="number"],select').forEach(x=>{x.addEventListener('input',calc);x.addEventListener('change',calc);});}
+function clearColumn(n){
+  if(n===1){b1.forEach(i=>document.getElementById(i).value='');['b1_idioma_sel','b1_triple_sel'].forEach(s=>document.getElementById(s).selectedIndex=0);['b1_opt1_name','b1_opt2_name'].forEach(t=>document.getElementById(t).value='');}
+  if(n===2){b2.forEach(i=>document.getElementById(i).value='');['b2_idioma_sel','b2_triple_sel','b2_fb_sel'].forEach(s=>document.getElementById(s).selectedIndex=0);document.getElementById('b2_opt_name').value='';}
+  if(n===3){['g_castellano','g_valenciano','g_idioma','g_hf','g_mates','v1_nota','v2_nota'].forEach(i=>document.getElementById(i).value='');['g_idioma_sel','g_hf_sel','v1_pond','v2_pond'].forEach(s=>document.getElementById(s).selectedIndex=1);['v1_name','v2_name'].forEach(t=>document.getElementById(t).value='');}
+  calc();
+}
+function clearAll(){document.querySelectorAll('input').forEach(i=>i.value='');document.querySelectorAll('select').forEach(s=>{if(s.id.endsWith('_pond'))s.selectedIndex=1;else s.selectedIndex=0;});calc();}
+function calc(){
+  let v1s=[];b1.forEach(i=>{const v=getNum(i);if(!isNaN(v))v1s.push(v);});
+  const m1=v1s.length?v1s.reduce((a,b)=>a+b,0)/v1s.length:NaN;setText('avg_b1',m1);
+  let v2s=[];b2.forEach(i=>{const v=getNum(i);if(!isNaN(v))v2s.push(v);});
+  const m2=v2s.length?v2s.reduce((a,b)=>a+b,0)/v2s.length:NaN;setText('avg_b2',m2);
+  const all=v1s.concat(v2s);const bach=all.length?all.reduce((a,b)=>a+b,0)/all.length:NaN;setText('r_bach',bach);
+  const g=['g_castellano','g_valenciano','g_idioma','g_hf','g_mates'];let gv=[];g.forEach(i=>{const v=getNum(i);if(!isNaN(v))gv.push(v);});
+  const ebau=gv.length?gv.reduce((a,b)=>a+b,0)/gv.length:NaN;setText('r_ebau_gen',ebau);
+  const acceso=(!isNaN(bach)&&!isNaN(ebau))?(0.6*bach+0.4*ebau):NaN;setText('r_acceso',acceso);
+  const v1=getNum('v1_nota')*parseFloat(document.getElementById('v1_pond').value);
+  const v2=getNum('v2_nota')*parseFloat(document.getElementById('v2_pond').value);
+  setText('r_v1',isNaN(v1)?NaN:v1);setText('r_v2',isNaN(v2)?NaN:v2);
+  let total=acceso;if(!isNaN(v1))total=(isNaN(total)?v1:total+v1);if(!isNaN(v2))total=(isNaN(total)?v2:total+v2);setText('r_total',total);
+}
+window.addEventListener('load',()=>{attach();calc();});
+</script>
+</main>
+</body>
+</html>
