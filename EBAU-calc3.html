@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculadora Nota de Acceso Universidad (Comunidad Valenciana)</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background-color: #f4f6f9;
+      color: #222;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #0056b3;
+      color: white;
+      text-align: center;
+      padding: 1rem;
+    }
+    main {
+      max-width: 1200px;
+      margin: 1rem auto;
+      padding: 1rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1rem;
+    }
+    .card {
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      padding: 1rem;
+    }
+    h2 {
+      background-color: #0074e8;
+      color: white;
+      font-size: 1.2rem;
+      text-align: center;
+      border-radius: 8px;
+      padding: 0.5rem;
+      margin-top: 0;
+    }
+    h3 {
+      font-size: 1rem;
+      margin-top: 0.5rem;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 0.3rem;
+      color: #0056b3;
+    }
+    label {
+      display: block;
+      margin-top: 0.5rem;
+    }
+    input[type="number"], select {
+      width: 100%;
+      padding: 0.3rem;
+      margin-top: 0.2rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .result-card {
+      grid-column: 1 / span 3;
+      background-color: #e8f0fe;
+      border-left: 5px solid #0056b3;
+    }
+    .result-line {
+      font-weight: bold;
+      margin-top: 0.3rem;
+    }
+    .note {
+      font-size: 0.9rem;
+      color: #444;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Calculadora de la Nota de Acceso a la Universidad (NAU) - Comunidad Valenciana</h1>
+  </header>
+
+  <div class="card" style="max-width: 1180px; margin: 1rem auto;">
+    <h2>Selecciona modalidad</h2>
+    <label>Modalidad de Bachillerato:</label>
+    <select id="modalidad">
+      <option value="ciencias">Ciencias y Tecnología</option>
+      <option value="humanidades">Humanidades</option>
+      <option value="sociales">Ciencias Sociales</option>
+      <option value="artes">Artes Plásticas, Imagen y Diseño</option>
+      <option value="musica">Música y Artes Escénicas</option>
+    </select>
+    <p class="note">
+      Selecciona la modalidad para mostrar las materias correspondientes.<br>
+      Las ponderaciones de la fase voluntaria de la EBAU deben seleccionarse manualmente.
+    </p>
+  </div>
+
+  <main>
+    <div class="card" id="columna1">
+      <h2>1.º Bachillerato</h2>
+      <h3>Materias comunes</h3>
+      <div id="comunes1"></div>
+      <h3>Materias según modalidad (1.º)</h3>
+      <div id="modalidad1"></div>
+      <h3>Optativa (1.º)</h3>
+      <div id="optativa1"></div>
+      <p id="media1"></p>
+    </div>
+
+    <div class="card" id="columna2">
+      <h2>2.º Bachillerato</h2>
+      <h3>Materias comunes</h3>
+      <div id="comunes2"></div>
+      <h3>Materias según modalidad (2.º)</h3>
+      <div id="modalidad2"></div>
+      <h3>Optativa (2.º)</h3>
+      <div id="optativa2"></div>
+      <p id="media2"></p>
+    </div>
+
+
+    <div class="card" id="columna3">
+      <h2>EBAU</h2>
+      <h3>Fase general</h3>
+      <div id="fase-general"></div>
+      <h3>Fase voluntaria</h3>
+      <div id="fase-voluntaria"></div>
+    </div>
+
+<div class="flex gap-2 mt-4 justify-center">
+  <button onclick="limpiar(document.getElementById('columna1'))" class="bg-gray-200 px-3 py-1 rounded hover:bg-gray-300">Limpiar 1.º</button>
+  <button onclick="limpiar(document.getElementById('columna2'))" class="bg-gray-200 px-3 py-1 rounded hover:bg-gray-300">Limpiar 2.º</button>
+  <button onclick="limpiarTodo()" class="bg-red-200 px-3 py-1 rounded hover:bg-red-300">Limpiar todo</button>
+</div>
+
+    <div class="card result-card" id="resultados">
+      <h2>Resultados</h2>
+      <div class="result-line" id="media-bach"></div>
+      <div class="result-line" id="media-ebau"></div>
+      <div class="result-line" id="nau"></div>
+      <div class="result-line" id="vol1"></div>
+      <div class="result-line" id="vol2"></div>
+      <div class="result-line" id="nat"></div>
+    </div>
+  </main>
+
+  <script>
+    const materias = {
+      comunes1: [
+        "Filosofía",
+        "Lengua Castellana y Literatura I",
+        "Lengua Extranjera I",
+        "Educación Física",
+        "Valencià: Llengua i Literatura I"
+      ],
+      comunes2: [
+        "Historia de España",
+        "Historia de la Filosofía",
+        "Lengua Castellana y Literatura II",
+        "Lengua Extranjera II",
+        "Valencià: Llengua i Literatura II"
+      ]
+    };
+
+    // Crea un campo de nota simple
+    function crearCampo(nombre, idBase) {
+      const div = document.createElement("div");
+      div.className = "mb-2";
+      const label = document.createElement("label");
+      label.textContent = nombre + ":";
+      div.appendChild(label);
+      const input = document.createElement("input");
+      input.type = "number";
+      input.min = 0;
+      input.max = 10;
+      input.step = 1;
+      input.id = idBase;
+      input.className = "p-1 border rounded w-full";
+      input.addEventListener("input", recalcular);
+      div.appendChild(input);
+      return div;
+    }
+
+    // ✅ Siempre muestra el campo de nota debajo del selector
+    function crearSelector(opciones, idBase, etiqueta, valorPorDefecto = opciones[0]) {
+      const div = document.createElement("div");
+      div.className = "mb-3";
+
+      const label = document.createElement("label");
+      label.textContent = etiqueta;
+      div.appendChild(label);
+
+      const select = document.createElement("select");
+      select.id = idBase + "-select";
+      select.className = "w-full mt-1 p-1 border border-gray-300 rounded";
+      
+      opciones.forEach((op) => {
+        const option = document.createElement("option");
+        option.value = op;
+        option.textContent = op;
+        select.appendChild(option);
+      });
+      
+      select.value = valorPorDefecto;
+      div.appendChild(select);
+
+      // Campo de nota siempre visible
+      const notaDiv = document.createElement("div");
+      notaDiv.className = "mt-2";
+      const notaLabel = document.createElement("label");
+      notaLabel.textContent = `${select.value} — Nota:`;
+      notaDiv.appendChild(notaLabel);
+
+      const input = document.createElement("input");
+      input.type = "number";
+      input.min = 0;
+      input.max = 10;
+      input.step = 1;
+      input.className = "w-full p-1 border border-gray-300 rounded mt-1";
+      notaDiv.appendChild(input);
+      div.appendChild(notaDiv);
+
+      select.addEventListener("change", () => {
+        notaLabel.textContent = `${select.value} — Nota:`;
+        recalcular();
+      });
+      input.addEventListener("input", recalcular);
+      return div;
+    }
+
+    // Contenedores
+    const comunes1Div = document.getElementById("comunes1");
+    const comunes2Div = document.getElementById("comunes2");
+
+    // Inserta las materias comunes
+    materias.comunes1.forEach((m, i) => {
+      if (m.includes("Lengua Extranjera")) {
+        comunes1Div.appendChild(crearSelector(["Inglés", "Francés"], "bach1-idioma", m, "Inglés"));
+      } else {
+        comunes1Div.appendChild(crearCampo(m, "bach1-" + i));
+      }
+    });
+    materias.comunes2.forEach((m, i) => {
+      if (m.includes("Lengua Extranjera")) {
+        comunes2Div.appendChild(crearSelector(["Inglés", "Francés"], "bach2-idioma", m, "Inglés"));
+      } else {
+        comunes2Div.appendChild(crearCampo(m, "bach2-" + i));
+      }
+    });
+
+// === MATERIAS DE MODALIDAD ===
+const materiasModalidad = {
+  ciencias: {
+    primero: [
+      "Matemáticas I",
+      "Física y Química",
+      ["Biología y Geología y CCAA", "Tecnología e Ingeniería I", "Dibujo Técnico I"]
+    ],
+    segundo: [
+      ["Matemáticas II", "Matemáticas CC Sociales II"],
+      ["Biología", "Física"],
+      ["Química", "Tecnología e Ingeniería II", "Dibujo Técnico II"]
+    ]
+  },
+  humanidades: {
+    primero: [
+      "Latín I",
+      "Griego I",
+      ["Literatura Universal", "Historia del Mundo Contemporáneo"]
+    ],
+    segundo: [
+      "Latín II",
+      ["Griego II", "Empresa y Diseño de Modelos de Negocio"],
+      ["Historia del Arte", "Geografía"]
+    ]
+  },
+  sociales: {
+    primero: [
+      "Matemáticas CC Sociales I",
+      "Economía",
+      ["Literatura Universal", "Historia del Mundo Contemporáneo"]
+    ],
+    segundo: [
+      "Matemáticas CC Sociales II",
+      ["Griego II", "Empresa y Diseño de Modelos de Negocio"],
+      ["Historia del Arte", "Geografía"]
+    ]
+  },
+  artes: {
+    primero: [
+      "Dibujo Artístico I",
+      ["Volumen", "Cultura Audiovisual"],
+      ["Proyectos Artísticos", "Dibujo Técnico Aplicado a Artes y Diseño"]
+    ],
+    segundo: [
+      "Dibujo Artístico II",
+      "Diseño",
+      ["Fundamentos Artísticos", "Dibujo Técnico Aplicado a Artes y Diseño II"]
+    ]
+  },
+  musica: {
+    primero: [
+      "Coro y Técnica Vocal I",
+      ["Análisis Musical I", "Artes Escénicas"],
+      ["Lenguaje y Práctica Musical", "Cultura Audiovisual"]
+    ],
+    segundo: [
+      ["Análisis Musical II", "Artes Escénicas II"],
+      "Coro y Técnica Vocal II",
+      "Historia de la Música y la Danza"
+    ]
+  }
+};
+
+// === OPCIONES DE OPTATIVAS ===
+const optativas1 = [
+  "Segunda Lengua Extranjera I: Francés",
+  "Biología Humana y Salud",
+  "Programación, Redes y Sistemas Informáticos I",
+  "Imagen y Sonido",
+  "Producción Musical",
+  "Gestión de Proyectos de Emprendimiento"
+];
+const optativas2 = [
+  "Actividad Física para la Salud y el Desarrollo Personal",
+  "Programación, Redes y Sistemas Informáticos II",
+  "Psicología",
+  "Segunda Lengua Extranjera II: Francés",
+  "Trabajo Experimental en Física y Química",
+  "Geología y Ciencias Ambientales",
+  "Descubriendo nuestras raíces clásicas",
+  "Técnicas de Expresión Graficoplásticas"
+];
+
+// === FASE GENERAL Y VOLUNTARIA ===
+const modalidadSelect = document.getElementById("modalidad");
+const modalidad1Div = document.getElementById("modalidad1");
+const modalidad2Div = document.getElementById("modalidad2");
+const opt1Div = document.getElementById("optativa1");
+const opt2Div = document.getElementById("optativa2");
+const faseGeneralDiv = document.getElementById("fase-general");
+const faseVolDiv = document.getElementById("fase-voluntaria");
+
+// === Generación de materias dinámicas ===
+function mostrarModalidad() {
+  const mod = modalidadSelect.value;
+  modalidad1Div.innerHTML = "";
+  modalidad2Div.innerHTML = "";
+
+  materiasModalidad[mod].primero.forEach((m, i) => {
+    if (Array.isArray(m)) {
+      modalidad1Div.appendChild(crearSelector(m, `mod1-${i}`, "Materia de modalidad"));
+    } else {
+      modalidad1Div.appendChild(crearCampo(m, `mod1-${i}`));
+    }
+  });
+
+  materiasModalidad[mod].segundo.forEach((m, i) => {
+    if (Array.isArray(m)) {
+      modalidad2Div.appendChild(crearSelector(m, `mod2-${i}`, "Materia de modalidad"));
+    } else {
+      modalidad2Div.appendChild(crearCampo(m, `mod2-${i}`));
+    }
+  });
+
+  // Optativas
+  opt1Div.innerHTML = "";
+  opt2Div.innerHTML = "";
+  opt1Div.appendChild(crearSelector(optativas1, "opt1", "Optativa 1.º", optativas1[0]));
+  opt2Div.appendChild(crearSelector(optativas2, "opt2", "Optativa 2.º", optativas2[0]));
+
+  recalcular();
+}
+
+// === Fase general ===
+function mostrarFaseGeneral() {
+  faseGeneralDiv.innerHTML = "";
+  const materiasGenerales = ["Lengua Castellana y Literatura", "Valencià: Llengua i Literatura", "Lengua Extranjera", "Historia de España / Historia de la Filosofía", "Matemáticas I / Matemáticas CC Sociales"];
+  materiasGenerales.forEach((m, i) => {
+    if (m.includes("/")) {
+      const opciones = m.split("/").map(x => x.trim());
+      faseGeneralDiv.appendChild(crearSelector(opciones, `ebau-${i}`, m));
+    } else {
+      faseGeneralDiv.appendChild(crearCampo(m, `ebau-${i}`));
+    }
+  });
+}
+
+// === Fase voluntaria ===
+function mostrarFaseVoluntaria() {
+  faseVolDiv.innerHTML = "";
+  for (let i = 1; i <= 2; i++) {
+    const div = document.createElement("div");
+    div.className = "mb-3";
+    const label = document.createElement("label");
+    label.textContent = `Voluntaria ${i} — Materia:`;
+    div.appendChild(label);
+
+    const inputMat = document.createElement("input");
+    inputMat.type = "text";
+    inputMat.placeholder = `Nombre de materia ${i}`;
+    inputMat.className = "w-full p-1 border border-gray-300 rounded mt-1";
+    div.appendChild(inputMat);
+
+    const labelNota = document.createElement("label");
+    labelNota.textContent = "Nota:";
+    div.appendChild(labelNota);
+    const inputNota = document.createElement("input");
+    inputNota.type = "number";
+    inputNota.min = 0;
+    inputNota.max = 10;
+    inputNota.step = 1;
+    inputNota.className = "w-full p-1 border border-gray-300 rounded mt-1";
+    div.appendChild(inputNota);
+
+    const labelPond = document.createElement("label");
+    labelPond.textContent = "Ponderación:";
+    div.appendChild(labelPond);
+    const selectPond = document.createElement("select");
+    selectPond.innerHTML = `
+      <option value="0.1">0.1</option>
+      <option value="0.2" selected>0.2</option>
+    `;
+    selectPond.className = "w-full mt-1 p-1 border border-gray-300 rounded";
+    div.appendChild(selectPond);
+
+    inputMat.addEventListener("input", recalcular);
+    inputNota.addEventListener("input", recalcular);
+    selectPond.addEventListener("change", recalcular);
+    faseVolDiv.appendChild(div);
+  }
+}
+
+// === CÁLCULOS ===
+function obtenerNotas(selector) {
+  const inputs = selector.querySelectorAll("input[type=number]");
+  const notas = [];
+  inputs.forEach(inp => {
+    const val = parseFloat(inp.value);
+    if (!isNaN(val)) notas.push(val);
+  });
+  if (notas.length === 0) return 0;
+  return notas.reduce((a,b) => a+b, 0) / notas.length;
+}
+
+function recalcular() {
+  const media1 = obtenerNotas(document.getElementById("columna1"));
+  const media2 = obtenerNotas(document.getElementById("columna2"));
+  const mediaBach = (media1 + media2) / 2;
+  const mediaEbau = obtenerNotas(faseGeneralDiv);
+
+  const volDivs = faseVolDiv.querySelectorAll("div.mb-3");
+  let sumVol = 0;
+  let vol1Txt = "", vol2Txt = "";
+  volDivs.forEach((d, i) => {
+    const nota = parseFloat(d.querySelector("input[type=number]").value) || 0;
+    const pond = parseFloat(d.querySelector("select").value);
+    const aport = nota * pond;
+    sumVol += aport;
+    if (i === 0) vol1Txt = `Voluntaria 1: ${aport.toFixed(3)}`;
+    else vol2Txt = `Voluntaria 2: ${aport.toFixed(3)}`;
+  });
+
+  const nau = 0.6 * mediaBach + 0.4 * mediaEbau;
+  const nat = nau + sumVol;
+
+  document.getElementById("media1").textContent = `Media 1.º Bachillerato: ${media1.toFixed(3)}`;
+  document.getElementById("media2").textContent = `Media 2.º Bachillerato: ${media2.toFixed(3)}`;
+  document.getElementById("media-bach").textContent = `Media Bachillerato: ${mediaBach.toFixed(3)}`;
+  document.getElementById("media-ebau").textContent = `Media Fase General EBAU: ${mediaEbau.toFixed(3)}`;
+  document.getElementById("nau").textContent = `Nota de acceso (NAU): ${nau.toFixed(3)}`;
+  document.getElementById("vol1").textContent = vol1Txt;
+  document.getElementById("vol2").textContent = vol2Txt;
+  document.getElementById("nat").textContent = `Nota total (NAT): ${nat.toFixed(3)}`;
+}
+
+// === FUNCIONES AUXILIARES ===
+function crearCampo(nombre, id) {
+  const div = document.createElement("div");
+  div.className = "mb-3";
+  const label = document.createElement("label");
+  label.textContent = nombre;
+  div.appendChild(label);
+  const input = document.createElement("input");
+  input.type = "number";
+  input.min = 0;
+  input.max = 10;
+  input.step = 1;
+  input.className = "w-full p-1 border border-gray-300 rounded mt-1";
+  input.addEventListener("input", recalcular);
+  div.appendChild(input);
+  return div;
+}
+
+function crearSelector(opciones, id, titulo, valorDefecto) {
+  const div = document.createElement("div");
+  div.className = "mb-3";
+  const label = document.createElement("label");
+  label.textContent = titulo;
+  div.appendChild(label);
+  const select = document.createElement("select");
+  select.className = "w-full p-1 border border-gray-300 rounded mt-1";
+  opciones.forEach(o => {
+    const opt = document.createElement("option");
+    opt.textContent = o;
+    opt.value = o;
+    select.appendChild(opt);
+  });
+  select.addEventListener("change", recalcular);
+  div.appendChild(select);
+  const input = document.createElement("input");
+  input.type = "number";
+  input.min = 0;
+  input.max = 10;
+  input.step = 1;
+  input.className = "w-full p-1 border border-gray-300 rounded mt-1";
+  input.addEventListener("input", recalcular);
+  div.appendChild(input);
+  return div;
+}
+
+// === BOTONES DE LIMPIEZA ===
+function limpiar(selector) {
+  const inputs = selector.querySelectorAll("input[type=number]");
+  inputs.forEach(inp => inp.value = "");
+  recalcular();
+}
+
+function limpiarTodo() {
+  document.querySelectorAll("input[type=number]").forEach(inp => inp.value = "");
+  document.querySelectorAll("select").forEach(sel => sel.selectedIndex = 0);
+  recalcular();
+}
+
+// === INICIALIZAR ===
+modalidadSelect.addEventListener("change", mostrarModalidad);
+mostrarModalidad();
+mostrarFaseGeneral();
+mostrarFaseVoluntaria();
+recalcular();
+
+
+
+  </script>
+</body>
+</html>
