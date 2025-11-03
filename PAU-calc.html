@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculadora Nota de Acceso Universidad (Comunidad Valenciana)</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background-color: #f4f6f9;
+      color: #222;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #0056b3;
+      color: white;
+      text-align: center;
+      padding: 1rem;
+    }
+    main {
+      max-width: 1200px;
+      margin: 1rem auto;
+      padding: 1rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1rem;
+    }
+    .card {
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      padding: 1rem;
+    }
+    h2 {
+      background-color: #0074e8;
+      color: white;
+      font-size: 1.2rem;
+      text-align: center;
+      border-radius: 8px;
+      padding: 0.5rem;
+      margin-top: 0;
+    }
+    h3 {
+      font-size: 1rem;
+      margin-top: 0.5rem;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 0.3rem;
+      color: #0056b3;
+    }
+    label {
+      display: block;
+      margin-top: 0.5rem;
+    }
+    input[type="text"], select {
+      width: 100%;
+      padding: 0.3rem;
+      margin-top: 0.2rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .result-card {
+      grid-column: 1 / span 3;
+      background-color: #e8f0fe;
+      border-left: 5px solid #0056b3;
+    }
+    .result-line {
+      font-weight: bold;
+      margin-top: 0.3rem;
+    }
+    .note {
+      font-size: 0.9rem;
+      color: #444;
+      margin-bottom: 1rem;
+    }
+    .conv-input {
+      background-color: #e0e0e0;
+      text-align: center;
+      color: #000;
+      font-weight: bold;
+    }
+    .column-button-container {
+      text-align: center;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Calculadora de la Nota de Acceso a la Universidad (NAU) - Comunidad Valenciana</h1>
+  </header>
+
+  <div class="card" style="max-width: 1180px; margin: 1rem auto;">
+    <h2>Selecciona modalidad</h2>
+    <label>Modalidad de Bachillerato:</label>
+    <select id="modalidad">
+      <option value="ciencias">Ciencias y Tecnología</option>
+      <option value="humanidades">Humanidades</option>
+      <option value="sociales">Ciencias Sociales</option>
+      <option value="artes">Artes Plásticas, Imagen y Diseño</option>
+      <option value="musica">Música y Artes Escénicas</option>
+    </select>
+    <p class="note">
+      Marca la casilla CONV para convalidar cualquier materia. No se tendrá en cuenta a la hora de calcular la media.<br>
+      Las ponderaciones de la fase voluntaria de la PAU deben seleccionarse manualmente.
+    </p>
+  </div>
+
+  <main>
+    <div class="card" id="columna1">
+      <h2>1.º Bachillerato</h2>
+      <h3>Materias comunes</h3>
+      <div id="comunes1"></div>
+      <h3>Materias según modalidad (1.º)</h3>
+      <div id="modalidad1"></div>
+      <h3>Optativa (1.º)</h3>
+      <div id="optativa1"></div>
+      <p id="media1"></p>
+      <div class="column-button-container">
+        <button onclick="limpiar(document.getElementById('columna1'))" class="bg-gray-200 px-3 py-1 rounded hover:bg-gray-300">Limpiar 1.º</button>
+      </div>
+    </div>
+
+    <div class="card" id="columna2">
+      <h2>2.º Bachillerato</h2>
+      <h3>Materias comunes</h3>
+      <div id="comunes2"></div>
+      <h3>Materias según modalidad (2.º)</h3>
+      <div id="modalidad2"></div>
+      <h3>Optativa (2.º)</h3>
+      <div id="optativa2"></div>
+      <p id="media2"></p>
+      <div class="column-button-container">
+        <button onclick="limpiar(document.getElementById('columna2'))" class="bg-gray-200 px-3 py-1 rounded hover:bg-gray-300">Limpiar 2.º</button>
+      </div>
+    </div>
+
+    <div class="card" id="columna3">
+      <h2>PAU</h2>
+      <h3>Fase general</h3>
+      <div id="fase-general"></div>
+      <h3>Fase voluntaria</h3>
+      <div id="fase-voluntaria"></div>
+      <div class="column-button-container">
+        <button onclick="limpiar(document.getElementById('columna3'))" class="bg-gray-200 px-3 py-1 rounded hover:bg-gray-300">Limpiar PAU</button>
+      </div>
+    </div>
+
+    <div class="card result-card" id="resultados">
+      <h2>Resultados</h2>
+      <div class="result-line" id="media-bach"></div>
+      <div class="result-line" id="media-ebau"></div>
+      <div class="result-line" id="nau"></div>
+      <div class="result-line" id="vol1"></div>
+      <div class="result-line" id="vol2"></div>
+      <div class="result-line" id="nat"></div>
+    </div>
+  </main>
+
+  <script>
+    // ===============================
+    // DATOS Y MATERIAS
+    // ===============================
+    const materias = {
+      comunes1: [
+        "Filosofía",
+        "Lengua Castellana y Literatura I",
+        "Lengua Extranjera I",
+        "Educación Física",
+        "Valencià: Llengua i Literatura I"
+      ],
+      comunes2: [
+        "Historia de España",
+        "Historia de la Filosofía",
+        "Lengua Castellana y Literatura II",
+        "Lengua Extranjera II",
+        "Valencià: Llengua i Literatura II"
+      ]
+    };
+
+    const materiasModalidad = {
+      ciencias: {
+        primero: [
+          "Matemáticas I",
+          ["Física y Química", "Biología y Geología y CCAA", "Tecnología e Ingeniería I", "Dibujo Técnico I"]
+        ],
+        segundo: [
+          ["Matemáticas II", "Matemáticas CC Sociales II"],
+          ["Biología", "Física"],
+          ["Química", "Tecnología e Ingeniería II", "Dibujo Técnico II"]
+        ]
+      },
+      humanidades: {
+        primero: [
+          "Latín I",
+          ["Griego I", "Literatura Universal", "Historia del Mundo Contemporáneo"]
+        ],
+        segundo: [
+          "Latín II",
+          ["Griego II", "Empresa y Diseño de Modelos de Negocio"],
+          ["Historia del Arte", "Geografía"]
+        ]
+      },
+      sociales: {
+        primero: [
+          "Matemáticas CC Sociales I",
+          ["Economía", "Literatura Universal", "Historia del Mundo Contemporáneo"]
+        ],
+        segundo: [
+          "Matemáticas CC Sociales II",
+          ["Griego II", "Empresa y Diseño de Modelos de Negocio"],
+          ["Historia del Arte", "Geografía"]
+        ]
+      },
+      artes: {
+        primero: [
+          "Dibujo Artístico I",
+          ["Volumen", "Cultura Audiovisual"],
+          ["Proyectos Artísticos", "Dibujo Técnico Aplicado a Artes y Diseño"]
+        ],
+        segundo: [
+          "Dibujo Artístico II",
+          "Diseño",
+          ["Fundamentos Artísticos", "Dibujo Técnico Aplicado a Artes y Diseño II"]
+        ]
+      },
+      musica: {
+        primero: [
+          "Coro y Técnica Vocal I",
+          ["Análisis Musical I", "Artes Escénicas"],
+          ["Lenguaje y Práctica Musical", "Cultura Audiovisual"]
+        ],
+        segundo: [
+          ["Análisis Musical II", "Artes Escénicas II"],
+          "Coro y Técnica Vocal II",
+          "Historia de la Música y la Danza"
+        ]
+      }
+    };
+
+    const optativas1 = [
+      "Segunda Lengua Extranjera I: Francés",
+      "Biología Humana y Salud",
+      "Programación, Redes y Sistemas Informáticos I",
+      "Imagen y Sonido",
+      "Producción Musical",
+      "Gestión de Proyectos de Emprendimiento"
+    ];
+    const optativas2 = [
+      "Actividad Física para la Salud y el Desarrollo Personal",
+      "Programación, Redes y Sistemas Informáticos II",
+      "Psicología",
+      "Segunda Lengua Extranjera II: Francés",
+      "Trabajo Experimental en Física y Química",
+      "Geología y Ciencias Ambientales",
+      "Descubriendo nuestras raíces clásicas",
+      "Técnicas de Expresión Graficoplásticas"
+    ];
+
+    // ===============================
+    // AUXILIARES
+    // ===============================
+    const modalidadSelect = document.getElementById("modalidad");
+    const modalidad1Div = document.getElementById("modalidad1");
+    const modalidad2Div = document.getElementById("modalidad2");
+    const opt1Div = document.getElementById("optativa1");
+    const opt2Div = document.getElementById("optativa2");
+    const faseGeneralDiv = document.getElementById("fase-general");
+    const faseVolDiv = document.getElementById("fase-voluntaria");
+    const comunes1Div = document.getElementById("comunes1");
+    const comunes2Div = document.getElementById("comunes2");
+
+    // -----------------------
+    // CREAR CAMPOS CON CONV
+    // -----------------------
+    function crearCampo(nombre) {
+      const div = document.createElement("div");
+      div.className = "mb-2";
+
+      const label = document.createElement("label");
+      label.textContent = nombre + ":";
+      div.appendChild(label);
+
+      const input = document.createElement("input");
+      input.type = "text";
+      input.className = "p-1 border rounded w-full";
+      div.appendChild(input);
+
+      const conv = document.createElement("input");
+      conv.type = "checkbox";
+      conv.className = "conv-checkbox";
+      const convLabel = document.createElement("span");
+      convLabel.textContent = "CONV";
+      div.appendChild(conv);
+      div.appendChild(convLabel);
+
+      conv.addEventListener("change", () => {
+        if(conv.checked){
+          input.value = "CONV";
+          input.disabled = true;
+          input.classList.add("conv-input");
+        } else {
+          input.disabled = false;
+          input.classList.remove("conv-input");
+          input.value = "";
+        }
+        recalcular();
+      });
+
+      input.addEventListener("input", recalcular);
+      return div;
+    }
+
+    // -----------------------
+    // CREAR SELECTORES CON CONV
+    // -----------------------
+    function crearSelector(opciones, titulo, valorDefecto){
+      const div = document.createElement("div");
+      div.className = "mb-2";
+
+      const label = document.createElement("label");
+      label.textContent = titulo + ":";
+      div.appendChild(label);
+
+      const select = document.createElement("select");
+      select.className = "w-full p-1 border border-gray-300 rounded mt-1";
+      opciones.forEach(o => {
+        const opt = document.createElement("option");
+        opt.value = o;
+        opt.textContent = o;
+        select.appendChild(opt);
+      });
+      if(valorDefecto) select.value = valorDefecto;
+      div.appendChild(select);
+
+      const otroInput = document.createElement("input");
+      otroInput.type = "text";
+      otroInput.placeholder = "Escribe la lengua";
+      otroInput.className = "otra-lengua w-full p-1 border border-gray-300 rounded mt-1";
+      otroInput.style.display="none";
+      div.appendChild(otroInput);
+
+      const input = document.createElement("input");
+      input.type = "text";
+      input.className = "w-full p-1 border border-gray-300 rounded mt-1";
+      div.appendChild(input);
+
+      const conv = document.createElement("input");
+      conv.type = "checkbox";
+      conv.className = "conv-checkbox";
+      const convLabel = document.createElement("span");
+      convLabel.textContent="CONV";
+      div.appendChild(conv);
+      div.appendChild(convLabel);
+
+      select.addEventListener("change", ()=>{
+        if(select.value==="Otra") otroInput.style.display="block";
+        else {otroInput.style.display="none"; otroInput.value="";}
+        recalcular();
+      });
+
+      conv.addEventListener("change", ()=>{
+        if(conv.checked){
+          input.value="CONV";
+          input.disabled=true;
+          input.classList.add("conv-input");
+        } else {
+          input.disabled=false;
+          input.classList.remove("conv-input");
+          input.value="";
+        }
+        recalcular();
+      });
+
+      input.addEventListener("input", recalcular);
+      otroInput.addEventListener("input", recalcular);
+
+      return div;
+    }
+
+    // -----------------------
+    // DESPLEGABLES CIENCIAS 1º
+    // -----------------------
+    function crearDesplegablesCiencias() {
+      const opciones = ["Física y Química", "Biología y Geología y CCAA", "Tecnología e Ingeniería I", "Dibujo Técnico I"];
+      const div1 = crearSelector(opciones.slice(), "Materia modalidad 1");
+      const div2 = crearSelector(opciones.slice(), "Materia modalidad 2");
+
+      const select1 = div1.querySelector("select");
+      const select2 = div2.querySelector("select");
+
+      function actualizarOpciones(){
+        const val1 = select1.value;
+        const val2 = select2.value;
+        Array.from(select1.options).forEach(opt => {opt.disabled=false});
+        Array.from(select2.options).forEach(opt => {opt.disabled=false});
+        if(val1) select2.querySelector(`option[value="${val1}"]`).disabled=true;
+        if(val2) select1.querySelector(`option[value="${val2}"]`).disabled=true;
+      }
+
+      select1.addEventListener("change", actualizarOpciones);
+      select2.addEventListener("change", actualizarOpciones);
+      actualizarOpciones();
+      return [div1, div2];
+    }
+
+    // -----------------------
+    // MOSTRAR MATERIAS DINÁMICAS
+    // -----------------------
+    function mostrarModalidad(){
+      const mod = modalidadSelect.value;
+      modalidad1Div.innerHTML="";
+      modalidad2Div.innerHTML="";
+
+      // 1º
+      materiasModalidad[mod].primero.forEach(m=>{
+        if(Array.isArray(m) && mod==="ciencias"){
+          const [d1,d2]=crearDesplegablesCiencias();
+          modalidad1Div.appendChild(d1);
+          modalidad1Div.appendChild(d2);
+        } else if(Array.isArray(m)){
+          modalidad1Div.appendChild(crearSelector(m, "Materia modalidad 1"));
+        } else {
+          modalidad1Div.appendChild(crearCampo(m));
+        }
+      });
+      // 2º
+      materiasModalidad[mod].segundo.forEach(m=>{
+        if(Array.isArray(m)) modalidad2Div.appendChild(crearSelector(m,"Materia modalidad 2"));
+        else modalidad2Div.appendChild(crearCampo(m));
+      });
+
+      // Optativas
+      opt1Div.innerHTML="";
+      opt2Div.innerHTML="";
+      opt1Div.appendChild(crearSelector(optativas1,"Optativa 1º",optativas1[0]));
+      opt2Div.appendChild(crearSelector(optativas2,"Optativa 2º",optativas2[0]));
+
+      recalcular();
+    }
+
+    // -----------------------
+    // CAMPOS COMUNES
+    // -----------------------
+    materias.comunes1.forEach(m=>{
+      if(m.includes("Lengua Extranjera")) comunes1Div.appendChild(crearSelector(["Inglés","Francés","Otra"],m));
+      else comunes1Div.appendChild(crearCampo(m));
+    });
+    materias.comunes2.forEach(m=>{
+      if(m.includes("Lengua Extranjera")) comunes2Div.appendChild(crearSelector(["Inglés","Francés","Otra"],m));
+      else comunes2Div.appendChild(crearCampo(m));
+    });
+
+    // -----------------------
+    // PAU
+    // -----------------------
+    function mostrarFaseGeneral(){
+      faseGeneralDiv.innerHTML="";
+      const materiasGenerales = ["Lengua Castellana y Literatura","Valencià: Llengua i Literatura","Lengua Extranjera","Historia de España / Historia de la Filosofía","Matemáticas I / Matemáticas CC Sociales"];
+      materiasGenerales.forEach((m,i)=>{
+        if(m.includes("/")){
+          const opciones = m.split("/").map(x=>x.trim());
+          faseGeneralDiv.appendChild(crearSelector(opciones,m));
+        } else if(m.includes("Lengua Extranjera")){
+          faseGeneralDiv.appendChild(crearSelector(["Inglés","Francés","Otra"],m));
+        } else {
+          faseGeneralDiv.appendChild(crearCampo(m));
+        }
+      });
+    }
+
+    function mostrarFaseVoluntaria(){
+      faseVolDiv.innerHTML="";
+      for(let i=1;i<=2;i++){
+        const div = document.createElement("div");
+        div.className="mb-3";
+
+        const labelMat = document.createElement("label");
+        labelMat.textContent=`Voluntaria ${i} — Materia:`;
+        div.appendChild(labelMat);
+
+        const inputMat = document.createElement("input");
+        inputMat.type="text";
+        inputMat.placeholder=`Nombre de materia ${i}`;
+        inputMat.className="w-full p-1 border border-gray-300 rounded mt-1";
+        div.appendChild(inputMat);
+
+        const labelNota = document.createElement("label");
+        labelNota.textContent="Nota:";
+        div.appendChild(labelNota);
+        const inputNota = document.createElement("input");
+        inputNota.type="text";
+        inputNota.min=0;
+        inputNota.max=10;
+        inputNota.step=1;
+        inputNota.className="w-full p-1 border border-gray-300 rounded mt-1";
+        div.appendChild(inputNota);
+
+        const labelPond = document.createElement("label");
+        labelPond.textContent="Ponderación:";
+        div.appendChild(labelPond);
+        const selectPond = document.createElement("select");
+        selectPond.innerHTML=`<option value="0.1">0.1</option><option value="0.2" selected>0.2</option>`;
+        selectPond.className="w-full mt-1 p-1 border border-gray-300 rounded";
+        div.appendChild(selectPond);
+
+        inputMat.addEventListener("input",recalcular);
+        inputNota.addEventListener("input",recalcular);
+        selectPond.addEventListener("change",recalcular);
+        faseVolDiv.appendChild(div);
+      }
+    }
+
+    // -----------------------
+    // CALCULOS
+    // -----------------------
+    function obtenerNotas(selector){
+      const inputs = selector.querySelectorAll("input[type=text]");
+      const notas=[];
+      inputs.forEach(inp=>{
+        if(inp.value!="" && inp.value!="CONV") notas.push(parseFloat(inp.value)||0);
+      });
+      if(notas.length===0) return 0;
+      return notas.reduce((a,b)=>a+b,0)/notas.length;
+    }
+
+    function recalcular(){
+      const media1 = obtenerNotas(document.getElementById("columna1"));
+      const media2 = obtenerNotas(document.getElementById("columna2"));
+      const mediaBach = (media1+media2)/2;
+      const mediaEbau = obtenerNotas(faseGeneralDiv);
+
+      const volDivs = faseVolDiv.querySelectorAll("div.mb-3");
+      let sumVol=0, vol1Txt="", vol2Txt="";
+      volDivs.forEach((d,i)=>{
+        const nota=parseFloat(d.querySelector("input[type=text]").value)||0;
+        const pond=parseFloat(d.querySelector("select").value);
+        const aport=nota*pond;
+        sumVol+=aport;
+        if(i===0) vol1Txt=`Voluntaria 1: ${aport.toFixed(3)}`;
+        else vol2Txt=`Voluntaria 2: ${aport.toFixed(3)}`;
+      });
+
+      const nau=0.6*mediaBach+0.4*mediaEbau;
+      const nat=nau+sumVol;
+
+      document.getElementById("media1").textContent=`Media 1.º Bachillerato: ${media1.toFixed(3)}`;
+      document.getElementById("media2").textContent=`Media 2.º Bachillerato: ${media2.toFixed(3)}`;
+      document.getElementById("media-bach").textContent=`Media Bachillerato: ${mediaBach.toFixed(3)}`;
+      document.getElementById("media-ebau").textContent=`Media Fase General PAU: ${mediaEbau.toFixed(3)}`;
+      document.getElementById("nau").textContent=`Nota de acceso (NAU): ${nau.toFixed(3)}`;
+      document.getElementById("vol1").textContent=vol1Txt;
+      document.getElementById("vol2").textContent=vol2Txt;
+      document.getElementById("nat").textContent=`Nota total (NAT): ${nat.toFixed(3)}`;
+    }
+
+    // -----------------------
+    // LIMPIEZA
+    // -----------------------
+    function limpiar(selector){
+      const inputs = selector.querySelectorAll("input[type=text]");
+      inputs.forEach(inp=>inp.value="");
+      selector.querySelectorAll("input.conv-checkbox").forEach(chk=>chk.checked=false);
+      recalcular();
+    }
+
+    function limpiarTodo(){
+      document.querySelectorAll("input[type=text]").forEach(inp=>inp.value="");
+      document.querySelectorAll("select").forEach(sel=>sel.selectedIndex=0);
+      document.querySelectorAll("input.conv-checkbox").forEach(chk=>chk.checked=false);
+      mostrarModalidad();
+      mostrarFaseGeneral();
+      mostrarFaseVoluntaria();
+      recalcular();
+    }
+
+    // ===============================
+    // INICIALIZACIÓN
+    // ===============================
+    modalidadSelect.addEventListener("change",mostrarModalidad);
+    mostrarModalidad();
+    mostrarFaseGeneral();
+    mostrarFaseVoluntaria();
+    recalcular();
+
+  </script>
+</body>
+</html>
